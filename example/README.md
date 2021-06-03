@@ -1,4 +1,4 @@
-# example_for_oktoast
+# example
 
 A new Flutter project.
 
