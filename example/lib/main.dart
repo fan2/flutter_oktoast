@@ -1,172 +1,133 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart'; // 1. import library
+import 'package:oktoast/oktoast.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return OKToast(
-      // 2-A: wrap your app with OKToast
-      textStyle: TextStyle(fontSize: 19.0, color: Colors.white),
-      backgroundColor: Colors.grey,
-      radius: 10.0,
-      child: MaterialApp(
-        title: 'Demo for OKToast',
-        theme: ThemeData(
+      dismissOtherOnShow: true,
+      child: new MaterialApp(
+        title: 'Flutter Demo',
+        theme: new ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+          // counter didn't reset back to zero; the application is not restarted.
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(),
+        home: new MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      animationCurve: Curves.easeIn,
-      animationBuilder: Miui10AnimBuilder(),
-      animationDuration: Duration(milliseconds: 200),
-      duration: Duration(seconds: 3),
-    );
-  }
-
-  // 2-B: Or wrap child of the builder method.
-  Widget buildApp() {
-    return MaterialApp(
-      home: MyHomePage(),
-      builder: (context, child) {
-        return OKToast(
-          child: child!,
-        );
-      },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  MyHomePage({Key? key, this.title = ''}) : super(key: key);
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => new _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    _counter++;
-
-    setState(() {});
-  }
-
   void _showToast() {
-    // 3-A use showToast method
-    showToast(
-      "$_counter",
-      position: ToastPosition.bottom,
-      backgroundColor: Colors.black.withOpacity(0.8),
-      radius: 13.0,
-      textStyle: TextStyle(fontSize: 18.0),
-      animationBuilder: Miui10AnimBuilder(),
-    );
-
-    showToast(
-      "$_counter",
-      duration: Duration(milliseconds: 3500),
-      position: ToastPosition.top,
-      backgroundColor: Colors.black.withOpacity(0.8),
-      radius: 3.0,
-      textStyle: TextStyle(fontSize: 30.0),
-    );
-
-    // 3-B use showToastWidget method
-    Widget widget = Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30.0),
-        child: Container(
-          width: 40.0,
-          height: 40.0,
-          color: Colors.grey.withOpacity(0.3),
-          child: Icon(
-            Icons.add,
-            size: 30.0,
-            color: Colors.green,
-          ),
-        ),
-      ),
-    );
-    ToastFuture toastFuture = showToastWidget(
-      widget,
-      duration: Duration(seconds: 3),
-      onDismiss: () {
-        print(
-            "the toast dismiss"); // The method will be called on toast dismiss.
-      },
-    );
-
-    // can use future
-    Future.delayed(Duration(seconds: 2), () {
-      toastFuture.dismiss(); // dismiss
-    });
+    showToast("msg");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Example for OKToast"),
+        title: Text("OKToast示例"),
       ),
-      body: Stack(
+      body: ListView(
         children: <Widget>[
-          Center(
-            child: ListView(
-              children: <Widget>[
-                Text(
-                  'You have pushed the button this many times:',
-                ),
-                Text(
-                  '$_counter',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Tooltip(
-                    message: "Toast status when using this to test routing.",
-                    child: ElevatedButton(
-                      child: Text("New page"),
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (ctx) => MyHomePage()));
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Tooltip(
-                    message: "Add number.",
-                    child: ElevatedButton(
-                      onPressed: _incrementCounter,
-                      child: Text('Add'),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Tooltip(
-                    message: "Show toast.",
-                    child: ElevatedButton(
-                      onPressed: _showToast,
-                      child: Text('Toast'),
-                    ),
-                  ),
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                      hintText: "Use TextField to test the toast of softkey."),
-                ),
-              ],
-            ),
+          RaisedButton(
+            child: Text('文字toast'),
+            onPressed: _showToast,
+          ),
+          RaisedButton(
+            child: Text('自定义Widget Toast'),
+            onPressed: _showCustomWidgetToast,
+          ),
+          RaisedButton(
+            child: Text('ToastHelper '),
+            onPressed: () => ToastHelper.showToast(context, "toast helper"),
           ),
         ],
       ),
     );
+  }
+
+  void _showCustomWidgetToast() {
+    var w = Center(
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        color: Colors.black.withOpacity(0.7),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            Text(
+              '添加成功',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+          mainAxisSize: MainAxisSize.min,
+        ),
+      ),
+    );
+    showToastWidget(w);
+  }
+}
+
+class ToastHelper {
+  static void showToast(BuildContext context, String text) {
+    const style = TextStyle(color: Colors.white, fontSize: 14.0);
+
+    Widget widget = Center(
+      child: Material(
+        child: Container(
+          color: Colors.black.withOpacity(0.5),
+          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+          child: Text(
+            text,
+            style: style,
+          ),
+        ),
+      ),
+    );
+    var entry = OverlayEntry(
+      builder: (_) => widget,
+    );
+
+    Overlay.of(context)?.insert(entry);
+
+    Timer(const Duration(seconds: 2), () {
+      entry?.remove();
+    });
   }
 }
